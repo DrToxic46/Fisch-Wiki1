@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fisch Wiki - Full Database</title>
+    <style>
+        :root { --primary: #1a73e8; --bg: #f8f9fa; --sidebar-bg: #ffffff; --text: #333; --border: #dadce0; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; background: var(--bg); color: var(--text); }
+        header { background: var(--primary); color: white; padding: 1rem; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .controls { background: white; border-bottom: 1px solid var(--border); padding: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .tabs { display: flex; gap: 10px; }
+        .tab-btn { padding: 10px 25px; border: 1px solid var(--border); background: #eee; cursor: pointer; border-radius: 5px; font-weight: bold; }
+        .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        #search { padding: 10px; width: 250px; border: 1px solid var(--border); border-radius: 5px; }
+        .main-content { display: flex; flex: 1; overflow: hidden; }
+        .sidebar { width: 350px; background: var(--sidebar-bg); border-right: 1px solid var(--border); overflow-y: auto; }
+        .list-item { padding: 12px 20px; border-bottom: 1px solid #f1f3f4; cursor: pointer; }
+        .list-item:hover { background: #f1f3f4; }
+        .list-item.selected { background: #e8f0fe; color: var(--primary); font-weight: bold; }
+        .details-panel { flex: 1; padding: 30px; overflow-y: auto; background: white; }
+        .info-card { max-width: 800px; border: 1px solid var(--border); border-radius: 8px; padding: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .stat-row { margin: 12px 0; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+        .label { font-weight: bold; color: #555; width: 140px; display: inline-block; }
+        .passive-box { margin-top: 20px; padding: 15px; background: #fffde7; border-left: 5px solid #fbc02d; line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+<header><h1>Fisch Wiki - Full Rod & Mutation Database</h1></header>
+
+<div class="controls">
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('rods')">Fishing Rods</button>
+        <button class="tab-btn" onclick="switchTab('mutations')">Mutations</button>
+    </div>
+    <input type="text" id="search" placeholder="Search items..." onkeyup="renderSidebar()">
+</div>
+
+<div class="main-content">
+    <div class="sidebar" id="sidebar"></div>
+    <div class="details-panel" id="details-panel">
+        <div style="text-align: center; color: #777; margin-top: 50px;">
+            [cite_start]<h3>Select an item from the list to view data [cite: 1, 2]</h3>
+        </div>
+    </div>
+</div>
+
+<script>
+    const database = {
+        rods: [
+            [cite_start]{ name: "Flimsy Rod", price: "0", luck: "0", lure: "0", weight: "10.4 kg", passive: "Starter rod. [cite: 1]" },
+            [cite_start]{ name: "Training Rod", price: "300", luck: "10", lure: "-70", weight: "9 kg", passive: "None. [cite: 1]" },
+            [cite_start]{ name: "Plastic Rod", price: "750", luck: "10", lure: "15", weight: "100 kg", passive: "None. [cite: 1]" },
+            [cite_start]{ name: "Carbon Rod", price: "2,000", luck: "15", lure: "25", weight: "600 kg", passive: "None. [cite: 1]" },
+            [cite_start]{ name: "Long Rod", price: "3,000", luck: "20", lure: "80", weight: "250 kg", passive: "None. [cite: 1]" },
+            [cite_start]{ name: "Fast Rod", price: "4,000", luck: "70", lure: "10", weight: "N/A", passive: "None. [cite: 1]" },
+            [cite_start]{ name: "Lucky Rod", price: "4,500", luck: "20", lure: "177", weight: "N/A", passive: "None. [cite: 1]" },
+            [cite_start]{ name: "Stone Rod", price: "2,000", luck: "-5", lure: "40", weight: "50,000 kg", passive: "None. [cite: 1]" },
+            [cite_start]{ name: "Phoenix Rod", price: "50,000", luck: "55", lure: "80", weight: "8,000 kg", passive: "None. [cite: 1]" },
+            [cite_start]{ name: "Steady Rod", price: "7,000", luck: "-60", lure: "35", weight: "250,000 kg", passive: "Increases shake button size. [cite: 1]" },
+            [cite_start]{ name: "Fortune Rod", price: "11,000", luck: "30", lure: "200", weight: "3,000 kg", passive: "None. [cite: 1]" },
+            [cite_start]{ name: "Rapid Rod", price: "12,000", luck: "89", lure: "49", weight: "800 kg", passive: "None. [cite: 1]" },
+            [cite_start]{ name: "Magnet Rod", price: "15,000", luck: "-10", lure: "0", weight: "10,000 kg", passive: "Greatly increases Crate chances. [cite: 1]" },
+            [cite_start]{ name: "Wildflower Rod", price: "7,000", luck: "70", lure: "75", weight: "700 kg", passive: "30% chance to catch Mother Nature (3x Value). [cite: 1]" },
+            { name: "Eidolon Rod", price: "2,000,000", luck: "100", lure: "50", weight: "Infinite", passive: "+40% Progress Speed; 35% chance for Phantom (4.5x). [cite_start]Sets Progress Speed to +666% and Control to 0.7 after 70% Progress. [cite: 1]" },
+            { name: "Dreambreaker", price: "5,000,000", luck: "120", lure: "215", weight: "Infinite", passive: "+15% Progress Speed; Day: -50% Weight; [cite_start]Night: +50% Weight, 35% chance for Distraught (8.5x). [cite: 1]" },
+            [cite_start]{ name: "Nocturnal Rod", price: "11,000", luck: "50", lure: "70", weight: "10,000 kg", passive: "Removes time preference Luck penalty. [cite: 1]" },
+            { name: "Aurora Rod", price: "70,000", luck: "45", lure: "60", weight: "6,000 kg", passive: "15% chance for Aurora (6.5x); [cite_start]30% during Aurora Borealis. [cite: 1]" },
+            [cite_start]{ name: "Precision Rod", price: "12,000", luck: "20", lure: "150", weight: "15 kg", passive: "None. [cite: 1]" },
+            { name: "Wisdom Rod", price: "2,000", luck: "55", lure: "80", weight: "2,000 kg", passive: "+5% XP for perfect streak; [cite_start]-10% XP for failed. [cite: 1]" },
+            { name: "Resourceful Rod", price: "1,000", luck: "30", lure: "60", weight: "1,000 kg", passive: "Doubles bait effect; [cite_start]60% chance to save bait. [cite: 1]" },
+            { name: "Voyager Rod", price: "300,000", luck: "45", lure: "85", weight: "N/A", passive: "Laser fills 20% progress; [cite_start]35% chance for Fossilized (2.5x). [cite: 1]" },
+            [cite_start]{ name: "Riptide Rod", price: "3,500", luck: "60", lure: "100", weight: "3,500 kg", passive: "After 3 perfect catches: 5 enhanced casts (+30% Luck, +25% Lure Speed). [cite: 1]" },
+            [cite_start]{ name: "Seasons Rod", price: "8,000", luck: "25", lure: "70", weight: "8,000 kg", passive: "Receive seasonal bonuses based on current Season. [cite: 1]" },
+            [cite_start]{ name: "The L Rod", price: "55,000", luck: "45", lure: "90", weight: "55,000 kg", passive: "36% chance for special catch (5.5x). [cite: 1]" },
+            [cite_start]{ name: "Arctic Rod", price: "25,000", luck: "25", lure: "45", weight: "7,500 kg", passive: "All fish caught are Frozen (1.3x). [cite: 1]" },
+            [cite_start]{ name: "Ice Warpers Rod", price: "65,000", luck: "50", lure: "60", weight: "75,000 kg", passive: "25% chance for Blighted (3x). [cite: 1]" },
+            [cite_start]{ name: "Avalanche Rod", price: "35,000", luck: "40", lure: "68", weight: "65,000 kg", passive: "25% chance for Sleet (2.4x). [cite: 1]" },
+            [cite_start]{ name: "Crystalized Rod", price: "35,000", luck: "35", lure: "45", weight: "25,000 kg", passive: "20% chance for Crystalized (3x). [cite: 1]" },
+            { name: "Summit Rod", price: "500,000", luck: "45", lure: "75", weight: "200,000 kg", passive: "40% Frozen, 20% Sleet, 15% Blighted; [cite_start]+10% Progress Speed. [cite: 1]" },
+            [cite_start]{ name: "Scurvy Rod", price: "40,000", luck: "25", lure: "50", weight: "2,000 kg", passive: "15% chance for Greedy (4x). [cite: 1]" },
+            [cite_start]{ name: "Tempest Rod", price: "500,000", luck: "90", lure: "120", weight: "80,000 kg", passive: "+15% progress speed. [cite: 1]" },
+            { name: "Abyssal Specter Rod", price: "850,000", luck: "60", lure: "90", weight: "Infinite", passive: "+20% weight buff; [cite_start]25% chance for Abyssal (3.5x). [cite: 1]" },
+            { name: "Poseidon Rod", price: "700,000", luck: "50", lure: "165", weight: "100,000 kg", passive: "25% chance for 75% base value; [cite_start]10% chance for King's Blessing (5.5x). [cite: 1]" },
+            { name: "Zeus Rod", price: "850,000", luck: "70", lure: "90", weight: "65,000 kg", passive: "10% thunderstorm chance; [cite_start]90% Electric Shock (3.5x) in storms. [cite: 1]" },
+            { name: "Kraken Rod", price: "950,000", luck: "60", lure: "185", weight: "115,000 kg", passive: "20% double fish; [cite_start]10% double with Tentacle Surge (7.8x). [cite: 1]" },
+            [cite_start]{ name: "Depthseeker Rod", price: "40,000", luck: "55", lure: "70", weight: "70,000 kg", passive: "+5% Progress Speed. [cite: 1]" },
+            [cite_start]{ name: "Champions Rod", price: "90,000", luck: "45", lure: "65", weight: "100,000 kg", passive: "None. [cite: 1]" },
+            [cite_start]{ name: "Reinforced Rod", price: "20,000", luck: "40", lure: "65", weight: "Infinite", passive: "Enables fishing in Roslit Volcano/Brine Pool. [cite: 1]" },
+            { name: "The Boom Ball", price: "50,000", luck: "0", lure: "0", weight: "500,000,000 kg", passive: "50% chance for Exploded (0.1x); [cite_start]+100% Progress Speed. [cite: 1]" }
+        ],
+        mutations: [
+            [cite_start]{ name: "Silver", mult: "1.8x", obtain: "General mutation. [cite: 2]" },
+            [cite_start]{ name: "Mosaic", mult: "1.5x", obtain: "General mutation. [cite: 2]" },
+            [cite_start]{ name: "Negative", mult: "1.3x", obtain: "General mutation. [cite: 2]" },
+            { name: "Albino", mult: "1.2x", obtain: "Can be sold to Ashe for 1.5x; [cite_start]More common with Noir Enchantment (50%). [cite: 2]" },
+            { name: "Amber", mult: "1.2x", obtain: "Ancient Isle only. [cite_start]Replaced by Purified (2x) or Revitalized (4x) via Chiseler. [cite: 2]" },
+            [cite_start]{ name: "Poisoned", mult: "0.9x", obtain: "Lost Jungle only. [cite: 2]" },
+            [cite_start]{ name: "Lunar", mult: "2.5x", obtain: "Moonlit Mirage, Astral Rod (5%), or Event Horizon Rod (5%). [cite: 2]" },
+            [cite_start]{ name: "Electric", mult: "2.1x", obtain: "Grand Reef (15%) or Storming Enchantment (50% during rain). [cite: 2]" },
+            [cite_start]{ name: "Crimson", mult: "4x", obtain: "Scarlet Spincaster Rod (30%). [cite: 2]" },
+            [cite_start]{ name: "Frozen", mult: "1.5x", obtain: "Arctic Rod (100%), Cryolash (50%), or Summit Rod (40%). [cite: 2]" },
+            [cite_start]{ name: "Glossy", mult: "1.6x", obtain: "Azure Of Lagoon (100%). [cite: 2]" },
+            [cite_start]{ name: "Coral", mult: "1.8x", obtain: "Coral Rod (50%) or Coral Spear (100%). [cite: 2]" },
+            [cite_start]{ name: "Shrouded", mult: "7x", obtain: "Elder Mossripper (20%) or Lost Jungle. [cite: 2]" },
+            [cite_start]{ name: "Fallen", mult: "6x", obtain: "Fallen Rod (50%). [cite: 2]" },
+            [cite_start]{ name: "Translucent", mult: "1.3x", obtain: "Ghastly Enchantment (100%). [cite: 2]" },
+            [cite_start]{ name: "Midas", mult: "2.5x", obtain: "Midas Rod (100%). [cite: 2]" },
+            [cite_start]{ name: "Mythical", mult: "5.5x", obtain: "Mythical Rod (30%) or Rainbow (15%). [cite: 2]" },
+            [cite_start]{ name: "Hexed", mult: "3x", obtain: "No-Life Rod (50%) or Original No-Life (20%). [cite: 2]" },
+            [cite_start]{ name: "Darkened", mult: "1.5x", obtain: "Noir Enchantment (50%) or Duskwire (68%). [cite: 2]" },
+            [cite_start]{ name: "Scorched", mult: "3x", obtain: "Phoenix Rod (40%) or Cinderstring (20-50%). [cite: 2]" },
+            [cite_start]{ name: "Greedy", mult: "5x", obtain: "Rod Of The Eternal King (60%), Scurvy (15%), Noctone (20%), or Dead Man's (10%). [cite: 2]" },
+            [cite_start]{ name: "Spirit", mult: "5.2x", obtain: "Spiritbinder (15%). [cite: 2]" },
+            [cite_start]{ name: "Vined", mult: "3.5x", obtain: "Vineweaver Rod (30%) or Lost Jungle. [cite: 2]" },
+            [cite_start]{ name: "Fossilized", mult: "3.3x", obtain: "Voyager Rod (35%). [cite: 2]" },
+            [cite_start]{ name: "Boreal", mult: "4x", obtain: "Boreal Rod (30%) or Boreal Pines. [cite: 2]" },
+            [cite_start]{ name: "Abyssal", mult: "5.5x", obtain: "Abyssal Specter (25%), Rod Of Depths (30%/Passive 100%), or Depths. [cite: 2]" },
+            [cite_start]{ name: "Mourned", mult: "7.5x", obtain: "Tidemourner (35%) or Tidefall. [cite: 2]" },
+            [cite_start]{ name: "Aurora", mult: "6.5x", obtain: "Aurora Borealis (1%), Aurora Rod (15-30%), or Aurora Bait (15-30%). [cite: 2]" },
+            [cite_start]{ name: "Nova", mult: "6x", obtain: "Starfall (5%), Rod of Cosmos (15%), or Starlight Worm Bait (30%). [cite: 2]" },
+            [cite_start]{ name: "Revitalized", mult: "4x", obtain: "Deliver Amber fish to the Chiseler. [cite: 2]" },
+            [cite_start]{ name: "Cursed", mult: "4x", obtain: "Cursed Storm (8%). [cite: 2]" },
+            [cite_start]{ name: "Moon-Kissed", mult: "4x", obtain: "Blue Moon event (5%). [cite: 2]" },
+            [cite_start]{ name: "Solarblaze", mult: "3x", obtain: "Eclipse event (10%), Fang of Eclipse (10-90%), or Wicked Fang (30%). [cite: 2]" },
+            [cite_start]{ name: "Atomic", mult: "8x", obtain: "Waters affected by Atomic Nuke (100%). [cite: 2]" },
+            [cite_start]{ name: "Nuclear", mult: "6x", obtain: "Waters affected by Nuke or Cursed Nuke (100%). [cite: 2]" },
+            [cite_start]{ name: "Purified", mult: "2.5x", obtain: "Chiseler (Amber fish) or Insight Enchantment (30%). [cite: 2]" },
+            [cite_start]{ name: "Rainbow Cluster", mult: "5x", obtain: "Rainbow (5%) or Rainbow Cluster Rod (20-35%). [cite: 2]" },
+            [cite_start]{ name: "Sleet", mult: "2.4x", obtain: "Avalanche event (10%), Avalanche Rod (25%), or Summit Rod (20%). [cite: 2]" },
+            [cite_start]{ name: "Blighted", mult: "3x", obtain: "Blizzard (15%), Ice Warpers Rod (25%), or Summit Rod (15%). [cite: 2]" },
+            [cite_start]{ name: "Brown Wood", mult: "3x", obtain: "Verdant Shear Rod Tree Ability (33.3%). [cite: 2]" },
+            [cite_start]{ name: "Green Leaf", mult: "3x", obtain: "Verdant Shear Rod Tree Ability (33.3%). [cite: 2]" },
+            [cite_start]{ name: "Mother Nature", mult: "3x", obtain: "Verdant Shear Rod (33.3%) or Wildflower Rod (30%). [cite: 2]" },
+            [cite_start]{ name: "Charred", mult: "0.5x", obtain: "Zeus Rod Thunderstorm Ability (10%). [cite: 2]" },
+            [cite_start]{ name: "Electric Shock", mult: "3.5x", obtain: "Zeus Rod Thunderstorm Ability (90%). [cite: 2]" },
+            [cite_start]{ name: "Sunken", mult: "6.3x", obtain: "Treasure Chests (3.83%), Sunken Rod (8%), or Dead Man's (10%). [cite: 2]" },
+            [cite_start]{ name: "Lightning", mult: "2x", obtain: "Zeus Rod Room during Zeus Storm (10%) or Test Rod (5%). [cite: 2]" },
+            [cite_start]{ name: "Galactic", mult: "5x", obtain: "Astrolure Bait (100%). [cite: 2]" },
+            [cite_start]{ name: "Gleebous", mult: "8x", obtain: "Blade Of Glorp (23%) or Gleebous Abundance (Roslit Bay). [cite: 2]" },
+            [cite_start]{ name: "Colossal Ink", mult: "5x", obtain: "Colossal Ink Bait (100%). [cite: 2]" },
+            [cite_start]{ name: "Corvid", mult: "5x", obtain: "Corvid Algae (100%). [cite: 2]" },
+            [cite_start]{ name: "Glowy", mult: "8x", obtain: "Glowworm Bait (100%) or Noctone (40%). [cite: 2]" },
+            [cite_start]{ name: "Neon", mult: "1x", obtain: "Hourglass Bait (100%). [cite: 2]" },
+            [cite_start]{ name: "Noctic", mult: "8.5x", obtain: "Noctic Larva (100%). [cite: 2]" },
+            [cite_start]{ name: "Nullified", mult: "5x", obtain: "Nullbit Bait (100%). [cite: 2]" },
+            [cite_start]{ name: "Obsidian", mult: "8.3x", obtain: "Obsidian-Bone (10%). [cite: 2]" },
+            [cite_start]{ name: "Carrot", mult: "5x", obtain: "Carrot Rod (15%) or Carrot Pool (15%). [cite: 2]" },
+            [cite_start]{ name: "Dirty", mult: "0.3x", obtain: "Earthworm Bait (100%). [cite: 2]" },
+            [cite_start]{ name: "Mossy", mult: "8.7x", obtain: "Elder Mossripper (5% base / 100% passive). [cite: 2]" },
+            [cite_start]{ name: "Prismize", mult: "5.5x", obtain: "Ethereal Prism Rod (50%). [cite: 2]" },
+            [cite_start]{ name: "Fabulous", mult: "9.6x", obtain: "Fabulous Rod (26%). [cite: 2]" },
+            [cite_start]{ name: "Ocean's Ruin", mult: "10.2x", obtain: "Thalassar's Ruin (30% / Passive 10%) [cite: 2]" },
+            [cite_start]{ name: "Rusty", mult: "0.7x", obtain: "Anchor n' Chain (10%). [cite: 2]" },
+            [cite_start]{ name: "Anomalous", mult: "5.55x", obtain: "Anomalous Enchantment (20%). [cite: 2]" },
+            [cite_start]{ name: "Aureolin", mult: "3.5x", obtain: "Auric Rod (20%). [cite: 2]" },
+            [cite_start]{ name: "Aurulent", mult: "3x", obtain: "Auric Rod (20%). [cite: 2]" },
+            [cite_start]{ name: "Aureate", mult: "2.5x", obtain: "Auric Rod (20%). [cite: 2]" },
+            [cite_start]{ name: "Aurelian", mult: "2x", obtain: "Auric Rod (20%). [cite: 2]" },
+            [cite_start]{ name: "Aurous", mult: "1.5x", obtain: "Auric Rod (20%). [cite: 2]" },
+            [cite_start]{ name: "Cracked", mult: "3x", obtain: "Blazebringer Rod (5-10%). [cite: 2]" },
+            [cite_start]{ name: "Emberflame", mult: "5x", obtain: "Blazebringer Rod (5%). [cite: 2]" },
+            [cite_start]{ name: "Ember", mult: "3x", obtain: "Blazebringer Rod (20-25%) or Magma Rod (35%). [cite: 2]" },
+            [cite_start]{ name: "Sanguine", mult: "5x", obtain: "Blood Reckoning Enchantment or Sanguine Spire (30%). [cite: 2]" },
+            [cite_start]{ name: "Studded", mult: "1.8x", obtain: "Brick Rod (100%). [cite: 2]" },
+            [cite_start]{ name: "Brined", mult: "3.5x", obtain: "Brine-Infused Rod (50%). [cite: 2]" },
+            [cite_start]{ name: "Celestial", mult: "4x", obtain: "Celestial Rod (100% bonus) or Astraeus Serenade (8%). [cite: 2]" },
+            [cite_start]{ name: "Chaotic", mult: "8x", obtain: "Chaotic Enchantment (8%) or Duskwire (30-97%). [cite: 2]" },
+            [cite_start]{ name: "Cement", mult: "1.5x", obtain: "Cinder Block Rod (70%). [cite: 2]" },
+            [cite_start]{ name: "Crystalized", mult: "3.5x", obtain: "Crystalized Rod (20%). [cite: 2]" },
+            [cite_start]{ name: "Solar", mult: "5.3x", obtain: "Daybreaker Rod (50% Day / 25% Night). [cite: 2]" },
+            [cite_start]{ name: "Distraught", mult: "8.5x", obtain: "Dreambreaker (25% Day / 35% Night). [cite: 2]" },
+            [cite_start]{ name: "Serene", mult: "8.5x", obtain: "Duskwire (2-3%), Polaris (18%), or Astraeus (10%). [cite: 2]" },
+            [cite_start]{ name: "Phantom", mult: "4.5x", obtain: "Eidolon Rod (35%). [cite: 2]" },
+            [cite_start]{ name: "Evil", mult: "6.5x", obtain: "Evil Pitchfork (20%). [cite: 2]" },
+            [cite_start]{ name: "Siren's Spite", mult: "5x", obtain: "Evil Pitchfork (25%). [cite: 2]" },
+            [cite_start]{ name: "Bloom", mult: "4x", obtain: "Free Spirit Rod (20%) or Chrysalis (92%). [cite: 2]" },
+            [cite_start]{ name: "Glacial", mult: "8x", obtain: "Frostbane Rod (1-3%) or Cryolash (15%). [cite: 2]" },
+            [cite_start]{ name: "Fungal", mult: "4x", obtain: "Fungal Rod (30%). [cite: 2]" },
+            [cite_start]{ name: "Cursed Touch", mult: "5x", obtain: "Great Dreamer Rod (50% on passive). [cite: 2]" },
+            [cite_start]{ name: "Oscar", mult: "6.4x", obtain: "Great Rod of Oscar (5%). [cite: 2]" },
+            [cite_start]{ name: "Heavenly", mult: "6x", obtain: "Heaven's Rod (35%). [cite: 2]" },
+            [cite_start]{ name: "Igneous", mult: "8.65x", obtain: "Igneous Rupturer (30%). [cite: 2]" },
+            [cite_start]{ name: "Tentacle Surge", mult: "7.8x", obtain: "Kraken Rod (10%) or Dead Man's (10%). [cite: 2]" },
+            [cite_start]{ name: "Lucid", mult: "3.5x", obtain: "Lucid Rod (20-30%). [cite: 2]" },
+            [cite_start]{ name: "Luminescent", mult: "6.5x", obtain: "Luminescent Oath (15%) or Ruinous Oath (25%). [cite: 2]" },
+            [cite_start]{ name: "Mastered", mult: "9x", obtain: "Luminescent/Ruinous Oath (100% perfect catch). [cite: 2]" },
+            [cite_start]{ name: "Ascended", mult: "9.9x", obtain: "Masterline Rod (25%). [cite: 2]" },
+            [cite_start]{ name: "Magical", mult: "7.2x", obtain: "Merlin's Staff (25%). [cite: 2]" },
+            [cite_start]{ name: "Skrunkly", mult: "2.5x", obtain: "Nico's Yarncaster (30%). [cite: 2]" },
+            [cite_start]{ name: "Nico's Nyantics", mult: "5x", obtain: "Nico's Yarncaster (30-33%). [cite: 2]" },
+            [cite_start]{ name: "Puritas", mult: "8.7x", obtain: "Onirifalx (3-7%). [cite: 2]" },
+            [cite_start]{ name: "Sacratus", mult: "7x", obtain: "Onirifalx (7-13%). [cite: 2]" },
+            [cite_start]{ name: "Levitas", mult: "5x", obtain: "Onirifalx (50-60%). [cite: 2]" },
+            [cite_start]{ name: "Sandy", mult: "1.2x", obtain: "Onirifalx (25%), Quest reward, or Test Rod (10%). [cite: 2]" },
+            [cite_start]{ name: "Harmonized", mult: "4.2x", obtain: "Pinion's Aria (42%). [cite: 2]" },
+            [cite_start]{ name: "King's Blessing", mult: "5.5x", obtain: "Poseidon Rod (10%). [cite: 2]" },
+            [cite_start]{ name: "Putrid", mult: "-0.5x", obtain: "Putrid Enchantment (2%). [cite: 2]" },
+            [cite_start]{ name: "Subspace", mult: "6x", obtain: "Quantum Enchantment (25%). [cite: 2]" },
+            [cite_start]{ name: "Jackpot", mult: "7.77x", obtain: "Random Rod (50%). [cite: 2]" },
+            [cite_start]{ name: "Unlucky", mult: "0.5x", obtain: "Random Rod (50%). [cite: 2]" },
+            [cite_start]{ name: "Requies", mult: "9.8x", obtain: "Requiem (20%). [cite: 2]" },
+            [cite_start]{ name: "Husk", mult: "0.15x", obtain: "Requiem (20%). [cite: 2]" },
+            [cite_start]{ name: "Tidal", mult: "7x", obtain: "Rod of Forgotten Fang (25% / Passive 100%). [cite: 2]" },
+            [cite_start]{ name: "Wrath", mult: "4.5x", obtain: "Zenith (70%), Dead Man's (10%), or Poseidon Temple (2%). [cite: 2]" },
+            [cite_start]{ name: "Royal", mult: "9.4x", obtain: "Royal Spear (35%). [cite: 2]" },
+            [cite_start]{ name: "Seasonal (Spring)", mult: "4.5x", obtain: "Seasons Rod (50%). [cite: 2]" },
+            [cite_start]{ name: "Seasonal (Autumn)", mult: "4x", obtain: "Seasons Rod (50%). [cite: 2]" },
+            [cite_start]{ name: "Seasonal (Winter)", mult: "2.5x", obtain: "Seasons Rod (50%). [cite: 2]" },
+            [cite_start]{ name: "Seasonal (Summer)", mult: "1x", obtain: "Seasons Rod (50%). [cite: 2]" },
+            [cite_start]{ name: "Blessed", mult: "8.5x", obtain: "Seraphic Rod (30-35%) or Masterline Rod (10%). [cite: 2]" },
+            [cite_start]{ name: "Forgotten", mult: "2x", obtain: "Thalassar's Ruin Passive (100%). [cite: 2]" },
+            [cite_start]{ name: "Exploded", mult: "0.1x", obtain: "The Boom Ball (50%). [cite: 2]" },
+            [cite_start]{ name: "Lost", mult: "4.5x", obtain: "The Lost Rod (36% after perfect). [cite: 2]" },
+            [cite_start]{ name: "Gemstone", mult: "5x", obtain: "Treasure Rod (20%). [cite: 2]" },
+            [cite_start]{ name: "Atlantean", mult: "4x", obtain: "Trident Rod (30%) or Dead Man's (10%). [cite: 2]" },
+            [cite_start]{ name: "Ashen Fortune", mult: "5x", obtain: "Volcanic Rod (25%). [cite: 2]" },
+            [cite_start]{ name: "Breezed", mult: "8.6x", obtain: "Wind Elemental (25%) or Astraeus Serenade (8%). [cite: 2]" },
+            [cite_start]{ name: "Withered", mult: "9.5x", obtain: "Withered Spear (25%). [cite: 2]" },
+            [cite_start]{ name: "Toxic", mult: "6x", obtain: "Toxic Spire Rod (15%). [cite: 2]" },
+            [cite_start]{ name: "Tryhard", mult: "10x", obtain: "Tryhard Rod (100%). [cite: 2]" }
+        ]
+    };
+
+    let currentCategory = 'rods';
+
+    function switchTab(cat) {
+        currentCategory = cat;
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.toggle('active', btn.innerText.toLowerCase().includes(cat)));
+        renderSidebar();
+    }
+
+    function renderSidebar() {
+        const query = document.getElementById('search').value.toLowerCase();
+        const sidebar = document.getElementById('sidebar');
+        sidebar.innerHTML = '';
+        database[currentCategory].filter(i => i.name.toLowerCase().includes(query)).forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'list-item';
+            div.innerText = item.name;
+            div.onclick = () => showDetails(item);
+            sidebar.appendChild(div);
+        });
+    }
+
+    function showDetails(item) {
+        const panel = document.getElementById('details-panel');
+        document.querySelectorAll('.list-item').forEach(el => el.classList.toggle('selected', el.innerText === item.name));
+
+        if (currentCategory === 'rods') {
+            panel.innerHTML = `
+                <div class="info-card">
+                    <h2>${item.name}</h2>
+                    <div class="stat-row"><span class="label">Price:</span> ${item.price} C$</div>
+                    <div class="stat-row"><span class="label">Luck:</span> +${item.luck}%</div>
+                    <div class="stat-row"><span class="label">Lure Speed:</span> ${item.lure}</div>
+                    <div class="stat-row"><span class="label">Max Weight:</span> ${item.weight}</div>
+                    <div class="passive-box"><strong>PASSIVE ABILITY:</strong><br>${item.passive}</div>
+                </div>`;
+        } else {
+            panel.innerHTML = `
+                <div class="info-card">
+                    <h2>${item.name} Mutation</h2>
+                    <div class="stat-row"><span class="label">Value Multiplier:</span> ${item.mult}</div>
+                    <div class="passive-box"><strong>HOW TO OBTAIN:</strong><br>${item.obtain}</div>
+                </div>`;
+        }
+    }
+
+    renderSidebar();
+</script>
+</body>
+</html>
